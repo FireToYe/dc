@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.ica.dao.IccnIcaServiceDao">
+    
+	<sql id="iccnIcaServiceColumns">
+		a.id AS "id",
+		a.db_id AS "dbId",
+		a.service_code AS "serviceCode",
+		a.service_name AS "serviceName",
+		a.service_params AS "serviceParams",
+		a.db_sql AS "dbSql",
+		a.respone_template AS "responeTemplate",
+		a.description AS "description",
+		a.status AS "status",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime",
+		a.erp_type AS "erp_type",
+		a.service_group AS "serviceGroup",
+		a.custom_version AS "customVersion",
+		a.system_version AS "systemVersion",
+		a.force_update AS "forceUpdate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="iccnIcaServiceJoins">
+	</sql>
+    
+	<select id="get" resultType="IccnIcaService">
+		SELECT 
+			<include refid="iccnIcaServiceColumns"/>
+		FROM iccn_ica_service a
+		<include refid="iccnIcaServiceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="IccnIcaService">
+		SELECT 
+			<include refid="iccnIcaServiceColumns"/>
+		FROM iccn_ica_service a
+		<include refid="iccnIcaServiceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="erpType != null and erpType != ''">
+				AND a.erp_type=#{erpType}
+			</if>
+			<if test="serviceCode != null and serviceCode != ''">
+				AND a.service_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceCode},'%')</if>
+			</if>
+			<if test="serviceName != null and serviceName != ''">
+				AND a.service_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceName},'%')</if>
+			</if>
+			<if test="serviceGroup != null and serviceGroup != ''">
+				AND a.service_group =#{serviceGroup}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		ORDER BY a.update_time desc
+	</select>
+	
+	<select id="findAllList" resultType="IccnIcaService">
+		SELECT 
+			<include refid="iccnIcaServiceColumns"/>
+		FROM iccn_ica_service a
+		<include refid="iccnIcaServiceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getByServiceCode" resultType="IccnIcaService">
+		SELECT 
+			<include refid="iccnIcaServiceColumns"/>
+		FROM iccn_ica_service a
+		<include refid="iccnIcaServiceJoins"/>
+		WHERE a.service_code = #{serviceCode}  AND a.del_flag = '0'
+		<if test="erpType != null and erpType != ''">
+				AND a.erp_type=#{erpType}
+		</if>
+		 AND a.status='1' LIMIT 1
+	</select>
+	<select id="checkOnlyByServiceCode" resultType="IccnIcaService">
+		SELECT 
+			<include refid="iccnIcaServiceColumns"/>
+		FROM iccn_ica_service a
+		<include refid="iccnIcaServiceJoins"/>
+		WHERE a.service_code = #{serviceCode}  AND a.del_flag = '0' 
+		<if test="erpType != null">
+				AND a.erp_type=#{erpType}
+			</if>
+ 		LIMIT 1
+	</select>
+	<select id="exportList" parameterType="java.util.List" resultType="IccnIcaService">
+		SELECT 
+			<include refid="iccnIcaServiceColumns"/>
+		FROM iccn_ica_service a
+		<include refid="iccnIcaServiceJoins"/>
+		WHERE a.id in 
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+       </select>
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO iccn_ica_service(
+			db_id,
+			service_code,
+			service_name,
+			service_params,
+			db_sql,
+			respone_template,
+			description,
+			status,
+			create_time,   
+			update_time,
+			custom_version,
+			system_version ,
+			force_update ,
+			erp_type,
+			service_group,
+			del_flag
+		) VALUES (
+			#{dbId},
+			#{serviceCode},
+			#{serviceName},
+			#{serviceParams},
+			#{dbSql},
+			#{responeTemplate},
+			#{description},
+			#{status},
+			now(),
+			now(),
+			 #{customVersion},
+			 #{systemVersion},
+			 #{forceUpdate},
+			#{erpType},
+			#{serviceGroup},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE iccn_ica_service SET 	
+			db_id = #{dbId},
+			service_code = #{serviceCode},
+			service_name = #{serviceName},
+			service_params = #{serviceParams},
+			db_sql = #{dbSql},
+			respone_template = #{responeTemplate},
+			description = #{description},
+			status = #{status},
+			service_group = #{serviceGroup},
+			custom_version = #{customVersion},
+			system_version = #{systemVersion},
+			force_update = #{forceUpdate},
+			update_time = now()
+		WHERE id = #{id}
+	</update>
+	
+	
+		<update id="updateByServiceCodeAndErpType">
+		UPDATE iccn_ica_service SET 	
+		db_id = #{dbId},
+			service_name = #{serviceName},
+			service_params = #{serviceParams},
+			db_sql = #{dbSql},
+			respone_template = #{responeTemplate},
+			description = #{description},
+			status = #{status},
+			service_group = #{serviceGroup},
+			custom_version = #{customVersion},
+			system_version = #{systemVersion},
+			force_update = #{forceUpdate},
+			update_time = now()
+		WHERE service_code = #{serviceCode}
+		<if test="erpType != null">
+				AND erp_type=#{erpType}
+		</if>
+	</update>
+	
+	<update id="delete">
+		UPDATE iccn_ica_service SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

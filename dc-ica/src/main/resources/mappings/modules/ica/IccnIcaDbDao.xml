@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.ica.dao.IccnIcaDbDao">
+    
+	<sql id="iccnIcaDbColumns">
+		a.id AS "id",
+		a.db_id AS "dbId",
+		a.db_name AS "dbName",
+		a.db_type AS "dbType",
+		a.db_version AS "dbVersion",
+		a.jdbc_driverclassname AS "jdbcDriverclassname",
+		a.jdbc_url AS "jdbcUrl",
+		a.jdbc_username AS "jdbcUsername",
+		a.jdbc_password AS "jdbcPassword",
+		a.description AS "description",
+		a.status AS "status",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="iccnIcaDbJoins">
+	</sql>
+    
+	<select id="get" resultType="IccnIcaDb">
+		SELECT 
+			<include refid="iccnIcaDbColumns"/>
+		FROM iccn_ica_db a
+		<include refid="iccnIcaDbJoins"/>
+		WHERE a.id = #{id}
+	</select>
+		<select id="getByDbId" resultType="IccnIcaDb">
+		SELECT 
+			<include refid="iccnIcaDbColumns"/>
+		FROM iccn_ica_db a
+		<include refid="iccnIcaDbJoins"/>
+		WHERE a.db_id = #{dbId}
+		AND a.del_flag = '0'
+	</select>
+	<select id="findList" resultType="IccnIcaDb">
+		SELECT 
+			<include refid="iccnIcaDbColumns"/>
+		FROM iccn_ica_db a
+		<include refid="iccnIcaDbJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="dbId != null and dbId != ''">
+				AND a.db_id = #{dbId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="IccnIcaDb">
+		SELECT 
+			<include refid="iccnIcaDbColumns"/>
+		FROM iccn_ica_db a
+		<include refid="iccnIcaDbJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO iccn_ica_db(
+			db_id,
+			db_name,
+			db_type,
+			db_version,
+			jdbc_driverclassname,
+			jdbc_url,
+			jdbc_username,
+			jdbc_password,
+			description,
+			status,
+			create_time,
+			del_flag
+		) VALUES (
+			#{dbId},
+			#{dbName},
+			#{dbType},
+			#{dbVersion},
+			#{jdbcDriverclassname},
+			#{jdbcUrl},
+			#{jdbcUsername},
+			#{jdbcPassword},
+			#{description},
+			#{status},
+			now(),
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE iccn_ica_db SET 	
+			db_id = #{dbId},
+			db_name = #{dbName},
+			db_type = #{dbType},
+			db_version = #{dbVersion},
+			jdbc_driverclassname = #{jdbcDriverclassname},
+			jdbc_url = #{jdbcUrl},
+			jdbc_username = #{jdbcUsername},
+			jdbc_password = #{jdbcPassword},
+			description = #{description},
+			status = #{status},
+			update_time = now()
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE iccn_ica_db SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

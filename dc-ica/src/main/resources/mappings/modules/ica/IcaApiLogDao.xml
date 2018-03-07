@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.ica.dao.IcaApiLogDao">
+    
+	<sql id="icaApiLogColumns">
+		a.id AS "id",
+		a.service_code AS "serviceCode",
+		a.service_name AS "serviceName",
+		a.service_params AS "serviceParams",
+		a.db_sql AS "dbSql",
+		a.respone_template AS "responeTemplate",
+		a.result AS "result",
+		a.ip AS "ip",
+		a.db_id AS "dbId",
+		a.res_duration AS "resDuration",
+		a.is_success AS "isSuccess",
+		a.create_time AS "createTime"
+	</sql>
+	
+	<sql id="icaApiLogJoins">
+	</sql>
+    
+	<select id="get" resultType="IcaApiLog">
+		SELECT 
+			<include refid="icaApiLogColumns"/>
+		FROM iccn_ica_api_log a
+		<include refid="icaApiLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="IcaApiLog">
+		SELECT 
+			<include refid="icaApiLogColumns"/>
+		FROM iccn_ica_api_log a
+		<include refid="icaApiLogJoins"/>
+		<where>
+			
+			<if test="serviceCode != null and serviceCode != ''">
+				AND a.service_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceCode},'%')</if>
+			</if>
+			<if test="serviceName != null and serviceName != ''">
+				AND a.service_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceName},'%')</if>
+			</if>
+			<if test="dbId != null and dbId != ''">
+				AND a.db_id = #{dbId}
+			</if>
+			<if test="isSuccess != null and isSuccess != ''">
+				AND a.is_success = #{isSuccess}
+			</if>
+			 <if test="beginCreateTime != null and beginCreateTime != ''">
+				AND  a.create_time &gt;=  #{beginCreateTime}
+				</if> 
+			<if test="endCreateTime != null and endCreateTime != ''">
+				AND  a.create_time  &lt;=
+				<if test="dbName == 'oracle'">#{endCreateTime}||' 23:59:59'</if>
+					<if test="dbName == 'mssql'">#{endCreateTime}+' 23:59:59'</if>
+					<if test="dbName == 'mysql'">concat(#{endCreateTime},' 23:59:59')</if>
+			</if>
+		</where>
+		ORDER BY a.id DESC
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="IcaApiLog">
+		SELECT 
+			<include refid="icaApiLogColumns"/>
+		FROM iccn_ica_api_log a
+		<include refid="icaApiLogJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO iccn_ica_api_log(
+			service_code,
+			service_name,
+			service_params,
+			db_sql,
+			respone_template,
+			result,
+			ip,
+			db_id,
+			res_duration,
+			is_success,
+			create_time
+		) VALUES (
+			#{serviceCode},
+			#{serviceName},
+			#{serviceParams},
+			#{dbSql},
+			#{responeTemplate},
+			#{result},
+			#{ip},
+			#{dbId},
+			#{resDuration},
+			#{isSuccess},
+			now()
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE iccn_ica_api_log SET 	
+			service_code = #{serviceCode},
+			service_name = #{serviceName},
+			service_params = #{serviceParams},
+			db_sql = #{dbSql},
+			respone_template = #{responeTemplate},
+			result = #{result},
+			ip = #{ip},
+			db_id = #{dbId},
+			res_duration = #{resDuration},
+			is_success = #{isSuccess},
+			create_time = #{createTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM iccn_ica_api_log
+		WHERE id = #{id}
+	</update>
+	
+	
+	<update id="deleteByTask">
+		<![CDATA[ DELETE FROM iccn_ica_api_log
+		WHERE create_time < #{createTime}]]>
+	</update>
+	
+	<update id="deleteRfaByTask">
+		<![CDATA[ DELETE FROM iccn_rfa_service_log
+		WHERE create_time < #{createTime}]]>
+	</update>
+</mapper>

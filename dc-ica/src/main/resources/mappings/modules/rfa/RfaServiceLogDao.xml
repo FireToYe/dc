@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.rfa.dao.RfaServiceLogDao">
+    
+	<sql id="rfaServiceLogColumns">
+		a.id AS "id",
+		a.url_id AS "urlId",
+		a.service_code AS "serviceCode",
+		a.service_name AS "serviceName",
+		a.request_params AS "requestParams",
+		a.service_params AS "serviceParams",
+		a.result AS "result",
+		a.description AS "description",
+		a.url AS "url",
+		a.headers AS "headers",
+		a.method AS "method",
+		a.content_type AS "contentType",
+		a.create_time AS "createTime",
+		a.del_flag AS "delFlag",
+		a.is_success AS "isSuccess",
+		a.res_duration AS "resDuration",
+		a.response_result AS "responseResult",
+		a.ip AS "ip"
+	</sql>
+	
+	<sql id="rfaServiceLogJoins">
+	</sql>
+    
+	<select id="get" resultType="RfaServiceLog">
+		SELECT 
+			<include refid="rfaServiceLogColumns"/>
+		FROM iccn_rfa_service_log a
+		<include refid="rfaServiceLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfaServiceLog">
+		SELECT 
+			<include refid="rfaServiceLogColumns"/>
+		FROM iccn_rfa_service_log a
+		<include refid="rfaServiceLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="urlId != null and urlId != ''">
+				AND a.url_id = #{urlId}
+			</if>
+			<if test="serviceName != null and serviceName != ''">
+				AND a.service_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceName},'%')</if>
+			</if>
+			<if test="url != null and url != ''">
+				AND a.url LIKE 
+					<if test="dbName == 'oracle'">'%'||#{url}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{url}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{url},'%')</if>
+			</if>
+			<if test="isSuccess != null and isSuccess != ''">
+				AND a.is_success = #{isSuccess}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		order by a.create_time desc
+	</select>
+	
+	<select id="findAllList" resultType="RfaServiceLog">
+		SELECT 
+			<include refid="rfaServiceLogColumns"/>
+		FROM iccn_rfa_service_log a
+		<include refid="rfaServiceLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO iccn_rfa_service_log(
+			url_id,
+			service_code,
+			service_name,
+			request_params,
+			service_params,
+			result,
+			description,
+			url,
+			headers,
+			method,
+			content_type,
+			create_time,
+			del_flag,
+			is_success,	
+			res_duration,
+			response_result,
+			ip
+		) VALUES (
+			#{urlId},
+			#{serviceCode},
+			#{serviceName},
+			#{requestParams},
+			#{serviceParams},
+			#{result},
+			#{description},
+			#{url},
+			#{headers},
+			#{method},
+			#{contentType},
+			now(),
+			#{delFlag},
+			#{isSuccess},
+			#{resDuration},
+			#{responseResult},
+			#{ip}
+		)
+	</insert>
+	<update id="update">
+		UPDATE iccn_rfa_service_log SET 	
+			url_id = #{urlId},
+			service_code = #{serviceCode},
+			service_name = #{serviceName},
+			request_params = #{requestParams},
+			service_params = #{serviceParams},
+			result = #{result},
+			description = #{description},
+			url = #{url},
+			headers = #{headers},
+			method = #{method},
+			content_type = #{contentType},
+			create_time = now(),
+			is_success = #{isSuccess},
+			res_duration = #{resDuration},
+			response_result = #{responseResult},
+			ip = #{ip}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE iccn_rfa_service_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

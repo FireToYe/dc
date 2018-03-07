@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.zhilink</groupId>
+		<artifactId>dc</artifactId>
+		<version>0.1.11-SNAPSHOT</version>
+	</parent>
+	<artifactId>dc-schedule</artifactId>
+	<!-- <packaging>war</packaging> -->
+	<name>dc-schedule</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.zhilink</groupId>
+			<artifactId>adp-sys</artifactId>
+			<version>0.1.17-SNAPSHOT</version>
+		</dependency>
+		<!-- 互联 -->
+		<dependency>
+			<groupId>com.belerweb</groupId>
+			<artifactId>social-sdk</artifactId>
+			<exclusions>
+			<exclusion>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+			</exclusion>
+		</exclusions>
+			<version>0.0.5</version>
+		</dependency>
+		<!-- ojdbc7 -->
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc7</artifactId>
+			<version>12.2.0.1</version>
+			<!-- <scope>system</scope> <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc7-12.2.0.1.jar</systemPath> -->
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>sqljdbc4</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.quartz-scheduler</groupId>
+		  <artifactId>quartz</artifactId>
+		  <version>2.2.3</version>
+		</dependency>
+	</dependencies>
+
+
+</project>

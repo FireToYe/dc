@@ -1,0 +1,96 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!-- 配置连接池 -->
+	<bean id="dataSource_xxxxxx" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="driverClassName">
+			<value>${ica.jdbc.driverClassName}</value>
+		</property>
+		<property name="url">
+			<value>${ica.jdbc.url}</value>
+		</property>
+		<property name="username">
+			<value>${ica.jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${ica.jdbc.password}</value>
+		</property>
+		<!-- 连接池最大使用连接数 -->
+		<property name="maxActive">
+			<value>10</value>
+		</property>
+		<!-- 初始化连接大小 -->
+		<property name="initialSize">
+			<value>3</value>
+		</property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait">
+			<value>60000</value>
+		</property>
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle">
+			<value>3</value>
+		</property>
+		<!-- 自动清除无用连接 -->
+		<property name="removeAbandoned">
+			<value>true</value>
+		</property>
+		<!-- 清除无用连接的等待时间 -->
+		<property name="removeAbandonedTimeout">
+			<value>1800</value>
+		</property>
+		<!-- 连接属性 -->
+		<property name="connectionProperties">
+			<value>clientEncoding=UTF-8</value>
+		</property>
+		<property name="testOnBorrow">
+			<value>false</value>
+		</property>
+		<property name="testWhileIdle">
+			<value>true</value>
+		</property>
+		<property name="validationQuery">
+			<value>${ica.jdbc.validationQuery}</value>
+		</property>
+		<property name="minEvictableIdleTimeMillis">
+			<value>30000</value>
+		</property>
+		<property name="timeBetweenEvictionRunsMillis">
+			<value>60000</value>
+		</property>
+		<!-- 连接属性 -->
+		<property name="testOnReturn">
+			<value>false</value>
+		</property>
+		<!-- 连接属性 -->
+		<property name="poolPreparedStatements">
+			<value>true</value>
+		</property>
+		<!-- 连接属性 -->
+		<property name="maxPoolPreparedStatementPerConnectionSize">
+			<value>100</value>
+		</property>
+	</bean>
+
+	<bean id="jdbcTemplate_xxxxxx" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource_xxxxxx"></property>
+	</bean>
+
+	<!-- 定义事务管理器 由于后加载采用编程事务-->
+	<bean id="transactionManager_xxxxxx"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource_xxxxxx" />
+	</bean>
+	
+	
+</beans>

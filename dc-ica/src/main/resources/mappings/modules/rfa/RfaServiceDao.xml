@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.rfa.dao.RfaServiceDao">
+    
+	<sql id="rfaServiceColumns">
+		a.id AS "id",
+		a.url_id AS "urlId",
+		a.service_code AS "serviceCode",
+		a.service_name AS "serviceName",
+		a.service_params AS "serviceParams",
+		a.respone_template AS "responeTemplate",
+		a.respone_example AS "responeExample",
+		a.description AS "description",
+		a.content_type AS "contentType",
+		a.status AS "status",
+		a.url AS "url",
+		a.params_resolve AS "paramsResolve",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime",
+		a.headers AS "headers",
+		a.method AS "method",
+		a.custom_version AS "customVersion",
+		a.system_version AS "systemVersion",
+		a.force_update AS "forceUpdate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfaServiceJoins">
+	</sql>
+    
+	<select id="get" resultType="RfaService">
+		SELECT 
+			<include refid="rfaServiceColumns"/>
+		FROM iccn_rfa_service a
+		<include refid="rfaServiceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfaService">
+		SELECT 
+			<include refid="rfaServiceColumns"/>
+		FROM iccn_rfa_service a
+		<include refid="rfaServiceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="serviceCode != null and serviceCode != ''">
+				AND a.service_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceCode},'%')</if>
+			</if>
+			<if test="serviceName != null and serviceName != ''">
+				AND a.service_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceName},'%')</if>
+			</if>
+			<if test="contentType != null and contentType != ''">
+				AND a.content_type = #{contentType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		order by a.update_time desc
+	</select>
+	
+	<select id="findAllList" resultType="RfaService">
+		SELECT 
+			<include refid="rfaServiceColumns"/>
+		FROM iccn_rfa_service a
+		<include refid="rfaServiceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	<select id="getByServiceCode" resultType="RfaService">
+		SELECT 
+			<include refid="rfaServiceColumns"/>
+		FROM iccn_rfa_service a
+		<include refid="rfaServiceJoins"/>
+		WHERE a.service_code = #{serviceCode}  AND a.del_flag = '0'
+		 AND a.status='1' LIMIT 1
+	</select>
+		<select id="checkOnlyServiceCode" resultType="RfaService">
+		SELECT 
+			<include refid="rfaServiceColumns"/>
+		FROM iccn_rfa_service a
+		<include refid="rfaServiceJoins"/>
+		WHERE a.service_code = #{serviceCode}  AND a.del_flag = '0' LIMIT 1
+	</select>
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO iccn_rfa_service(
+			url_id,
+			service_code,
+			service_name,
+			service_params,
+			respone_template,
+			respone_example,
+			description,
+			content_type,
+			status,
+			url,
+			params_resolve,
+			create_time,
+			update_time,
+			headers,
+			method,
+			custom_version,
+			system_version ,
+			force_update ,
+			del_flag
+		) VALUES (
+			#{urlId},
+			#{serviceCode},
+			#{serviceName},
+			#{serviceParams},
+			#{responeTemplate},
+			#{responeExample},
+			#{description},
+			#{contentType},
+			#{status},
+			#{url},
+			#{paramsResolve},
+			now(),
+			now(),
+			#{headers},
+			#{method},
+			#{customVersion},
+			 #{systemVersion},
+			 #{forceUpdate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE iccn_rfa_service SET 	
+			url_id = #{urlId},
+			service_code = #{serviceCode},
+			service_name = #{serviceName},
+			service_params = #{serviceParams},
+			respone_template = #{responeTemplate},
+			respone_example = #{responeExample},
+			description = #{description},
+			content_type = #{contentType},
+			status = #{status},
+			url = #{url},
+			params_resolve = #{paramsResolve},
+			update_time = now(),
+			headers = #{headers},
+			custom_version = #{customVersion},
+			system_version = #{systemVersion},
+			force_update = #{forceUpdate},
+			method = #{method}
+		WHERE id = #{id}
+	</update>
+	
+		<update id="updateByServiceCode">
+		UPDATE iccn_rfa_service SET 	
+			url_id = #{urlId},
+			service_name = #{serviceName},
+			service_params = #{serviceParams},
+			respone_template = #{responeTemplate},
+			respone_example = #{responeExample},
+			description = #{description},
+			content_type = #{contentType},
+			status = #{status},
+			url = #{url},
+			params_resolve = #{paramsResolve},
+			update_time = now(),
+			headers = #{headers},
+			method = #{method},
+			custom_version = #{customVersion},
+			system_version = #{systemVersion},
+			force_update = #{forceUpdate}
+		WHERE service_code = #{serviceCode}
+	</update>
+	<update id="delete">
+		UPDATE iccn_rfa_service SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

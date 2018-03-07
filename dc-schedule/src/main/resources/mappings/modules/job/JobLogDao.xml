@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.job.dao.JobLogDao">
+    
+	<sql id="jobLogColumns">
+		a.id AS "id",
+		a.job_id AS "jobId",
+		a.execute_type AS "executeType",
+		a.group_name AS "groupName",
+		a.method AS "method",
+		a.service_code AS "serviceCode",
+		a.res_service_code AS "resServiceCode",
+		a.request_params AS "requestParams",
+		a.result AS "result",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.res_duration AS "resDuration",
+		a.is_success AS "isSuccess",
+		a.pre_paramter AS "preParamter",
+		a.exception AS "exception"
+	</sql>
+	
+	<sql id="jobLogJoins">
+	</sql>
+    
+	<select id="get" resultType="JobLog">
+		SELECT 
+			<include refid="jobLogColumns"/>
+		FROM dc_job_log a
+		<include refid="jobLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JobLog">
+		SELECT 
+			<include refid="jobLogColumns"/>
+		FROM dc_job_log a
+		<include refid="jobLogJoins"/>
+		<where>
+			
+			<if test="jobId != null and jobId != ''">
+				AND a.job_id = #{jobId}
+			</if>
+			<if test="executeType != null and executeType != ''">
+				AND a.execute_type = #{executeType}
+			</if>
+			<if test="groupName != null and groupName != ''">
+				AND a.group_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{groupName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{groupName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{groupName},'%')</if>
+			</if>
+			<if test="serviceCode != null and serviceCode != ''">
+				AND a.service_code = #{serviceCode}
+			</if>
+			<if test="isSuccess != null and isSuccess != ''">
+				AND a.is_success = #{isSuccess}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		order by a.id desc
+	</select>
+	
+	<select id="findAllList" resultType="JobLog">
+		SELECT 
+			<include refid="jobLogColumns"/>
+		FROM dc_job_log a
+		<include refid="jobLogJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getLastEnyity" resultType="JobLog" parameterType="java.lang.String">
+		SELECT 
+			<include refid="jobLogColumns"/>
+		FROM dc_job_log a
+		<include refid="jobLogJoins"/>
+		WHERE a.job_id = #{jobId} AND a.is_success='1' order by a.start_time desc limit 1
+	</select>
+	<insert id="insert">
+		INSERT INTO dc_job_log(
+			id,
+			job_id,
+			execute_type,
+			group_name,
+			method,
+			service_code,
+			res_service_code,
+			request_params,
+			result,
+			start_time,
+			end_time,
+			res_duration,
+			is_success,
+			pre_paramter,
+			exception
+		) VALUES (
+			#{id},
+			#{jobId},
+			#{executeType},
+			#{groupName},
+			#{method},
+			#{serviceCode},
+			#{resServiceCode},
+			#{requestParams},
+			#{result},
+			#{startTime},
+			#{endTime},
+			#{resDuration},
+			#{isSuccess},
+			#{preParamter},
+			#{exception}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE dc_job_log SET 	
+			job_id = #{jobId},
+			execute_type = #{executeType},
+			group_name = #{groupName},
+			method = #{method},
+			service_code = #{serviceCode},
+			res_service_code = #{resServiceCode},
+			request_params = #{requestParams},
+			result = #{result},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			res_duration = #{resDuration},
+			is_success = #{isSuccess},
+			pre_paramter = #{preParamter},
+			exception = #{exception}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM dc_job_log
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

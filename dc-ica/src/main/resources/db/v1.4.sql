@@ -1,0 +1,1 @@
+ALTER TABLE `iccn_ica_api_log` modify  COLUMN `db_sql` LONGTEXT COMMENT '数据库sql';

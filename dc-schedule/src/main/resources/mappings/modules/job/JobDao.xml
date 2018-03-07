@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhilink.srm.manager.modules.job.dao.JobDao">
+    
+	<sql id="jobColumns">
+		a.id AS "id",
+		a.job_name AS "jobName",
+		a.job_group AS "jobGroup",
+		a.detail AS "detail",
+		a.cron_expression AS "cronExpression",
+		a.job_state AS "jobState",
+		a.is_concurrent AS "isConcurrent",
+		a.execute_type AS "executeType",
+		a.parameter AS "parameter",
+		a.spring_id AS "springId",
+		a.bean_class_name AS "beanClassName",
+		a.method_name AS "methodName",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag",
+		a.service_code AS "serviceCode",
+		a.depend_last AS "dependLast",
+		a.res_service_code AS "resServiceCode",
+		a.date_format AS "dateFormat",
+		a.data_parameter_name AS "dataParameterName",
+		a.depend_last_time AS "dependLastTime"
+	</sql>
+	
+	<sql id="jobJoins">
+	</sql>
+    
+	<select id="get" resultType="JobEntity">
+		SELECT 
+			<include refid="jobColumns"/>
+		FROM dc_job a
+		<include refid="jobJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByNameAndGroup" resultType="JobEntity">
+		SELECT
+		<include refid="jobColumns"/>
+		FROM dc_job a
+		<include refid="jobJoins"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} and a.job_name=#{jobName} and a.job_group = #{jobGroup} limit 1
+ 	</select>
+	
+	<select id="findList" resultType="JobEntity">
+		SELECT 
+			<include refid="jobColumns"/>
+		FROM dc_job a
+		<include refid="jobJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="JobEntity">
+		SELECT 
+			<include refid="jobColumns"/>
+		FROM dc_job a
+		<include refid="jobJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO dc_job(
+			job_name,
+			job_group,
+			detail,
+			cron_expression,
+			job_state,
+			is_concurrent,
+			execute_type,
+			parameter,
+			spring_id,
+			bean_class_name,
+			method_name,
+			create_time,
+			update_time,
+			del_flag,
+			depend_last,
+			service_code,
+			depend_last_time,
+			date_format,
+			data_parameter_name,
+			res_service_code
+		) VALUES (
+			#{jobName},
+			#{jobGroup},
+			#{detail},
+			#{cronExpression},
+			'0',
+			#{isConcurrent},
+			#{executeType},
+			#{parameter},
+			#{springId},
+			#{beanClassName},
+			#{methodName},
+			now(),
+			#{updateTime},
+			#{delFlag},
+			#{dependLast},
+			#{serviceCode},
+			#{dependLastTime},
+			#{dateFormat},
+			#{dataParameterName},
+			#{resServiceCode}
+		)
+	</insert>
+	<update id="update">
+		UPDATE dc_job SET 	
+			job_name = #{jobName},
+			job_group = #{jobGroup},
+			detail = #{detail},
+			cron_expression = #{cronExpression},
+			is_concurrent = #{isConcurrent},
+			execute_type = #{executeType},
+			parameter = #{parameter},
+			spring_id = #{springId},
+			bean_class_name = #{beanClassName},
+			method_name = #{methodName},
+			update_time = now(),
+			depend_last = #{dependLast},
+			service_code = #{serviceCode},
+			depend_last_time = #{dependLastTime},
+			date_format = #{dateFormat},
+			data_parameter_name=#{dataParameterName},
+			res_service_code = #{resServiceCode}
+		WHERE id = #{id}
+	</update>
+	<update id="updateState">
+	 	UPDATE dc_job SET job_state = #{jobState},update_time = now() WHERE id=#{id}
+	</update>
+	<update id="delete">
+		UPDATE dc_job SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
